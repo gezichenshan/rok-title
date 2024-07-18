@@ -5,7 +5,7 @@ import axios from "axios";
 import { join } from "node:path";
 
 import { setTimeout } from "node:timers/promises";
-import { base64_encode } from "./utils";
+import { base64_encode ,wait} from "./utils";
 
 import {
   COORDINATES_LOST_INPUT,
@@ -33,7 +33,7 @@ import { getLastLocation } from "./services/api";
 
 const adb = new AdbClient({
   // bin: "C:\\Users\\admin\\Desktop\\JD\\title-script\\platform-tools\\adb.exe",
-  bin: "D:\\Game\\leidian\\LDPlayer9\\adb.exe",
+  bin: "/Users/super/yjd/platform-tools",
   host: "127.0.0.1",
   port: 5037,
 });
@@ -48,7 +48,6 @@ const isInHomeLnad = async (): Promise<boolean> => {
       imgBase64: screenshotBuffer.toString("base64"),
     })
     .then((res) => res.data);
-
   return isIn;
 };
 
@@ -71,8 +70,10 @@ const getTitleButtonCoordinates = async (
     .post(`${OPENCY_SERVER_URL}/find_cutout_position`, {
       imgBase64: screenshotBuffer.toString("base64"),
     })
-    .then((res) => res.data);
-
+    .then((res) => {
+      return res.data
+    });
+    
   if (!addTitleButtoncoordinates) {
     return getTitleButtonCoordinates(cityLocationIndex + 1);
   }
@@ -81,12 +82,15 @@ const getTitleButtonCoordinates = async (
 };
 
 async function main() {
+
+
   try {
     const location = await getLastLocation();
     if (!location) {
       console.log("location 为空，5秒后loop", location);
       return LOCATION_QUERY_LOOP;
     }
+    console.log('new location，', location)
     // return;
     // location格式为：719,437,公爵,c11360,unchanged
     // const location = await getLastLocation();
@@ -96,23 +100,59 @@ async function main() {
     const [userCorX, userCorY, titleType, areaCode] = locationArr;
     const is_in_homeland = await isInHomeLnad();
 
+    /**
+     * 唤起坐标输入框
+     */
+    console.log('is_in_homeland',is_in_homeland)
     await device.shell(
       `input tap ${is_in_homeland ? COORDINATES_INPUT : COORDINATES_LOST_INPUT}`
     );
+    await setTimeout(NEW_CLICK_IDLE_TIMEOUT);
     await device.shell(`input tap ${AREA_CODE_INPUT}`);
-    await device.shell(
-      "input keyevent --longpress 67 67 67 67 67 67 67 67 67 67 67 67 67 67 67 67 67 67"
-    );
+
+
+
+    
+    // await device.shell(
+    //   "input keyevent --longpress 67 67 67 67 67 67 67 67 67 67 67 67 67 67 67 67 67 67"
+    // );
+    /**
+     * deletle
+     */
+    for(let i=0;i<20;i++){
+      await device.shell(
+        "input keyevent 67"
+      );
+    }
+    await setTimeout(NEW_CLICK_IDLE_TIMEOUT);
     await device.shell(`input text ${areaCode || "544"}`);
-    setTimeout(750);
-    await device.shell(`input tap 500 227`); //点击其他位置，避免下面的事件不生效
+    await setTimeout(NEW_CLICK_IDLE_TIMEOUT);
+    await device.shell(`input tap 491 565`); //点击其他位置，避免下面的事件不生效
+    await setTimeout(NEW_CLICK_IDLE_TIMEOUT);
+    
     await device.shell(`input tap ${COORDINATES_INPUT_X}`);
+    await setTimeout(NEW_CLICK_IDLE_TIMEOUT);
+
     await device.shell(`input text ${userCorX}`);
-    await device.shell(`input tap ${INPUT_CONFIRM}`);
+    await setTimeout(NEW_CLICK_IDLE_TIMEOUT);
+
+    await device.shell(`input tap 491 565`); //点击其他位置，避免下面的事件不生效
+    await setTimeout(NEW_CLICK_IDLE_TIMEOUT);
+
     await device.shell(`input tap ${COORDINATES_INPUT_Y}`);
+    await setTimeout(NEW_CLICK_IDLE_TIMEOUT);
+
     await device.shell(`input text ${userCorY}`);
-    await device.shell(`input tap ${INPUT_CONFIRM}`);
+    await setTimeout(NEW_CLICK_IDLE_TIMEOUT);
+
+    await device.shell(`input tap 491 565`); //点击其他位置，避免下面的事件不生效
+    await setTimeout(NEW_CLICK_IDLE_TIMEOUT);
+
     await device.shell(`input tap ${SEARCH_BTN}`);
+    await setTimeout(NEW_CLICK_IDLE_TIMEOUT);
+
+
+    
     console.log(
       is_in_homeland,
       areaCode,
@@ -130,6 +170,11 @@ async function main() {
     }
 
     const titlePos = await getTitleButtonCoordinates();
+
+    if(!titlePos){
+      console.log('rok title no found； reloop')
+      return LOCATION_QUERY_LOOP
+    }
 
     const realTitlePos = { x: titlePos.x + 10, y: titlePos.y + 50 }; //增加title btn的偏移量
 
