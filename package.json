@@ -7,8 +7,9 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "tsx ./src/index.ts",
+    "dev2": "tsx ./src/index2.ts",
     "build": "rollup --config rollup.config.js ",
-    "tap":"tsx ./src/utils/mumu.ts"
+    "tap": "tsx ./src/utils/mumu.ts"
   },
   "author": "",
   "license": "ISC",
