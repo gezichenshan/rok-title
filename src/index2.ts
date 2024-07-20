@@ -36,7 +36,6 @@ async function main() {
       console.log("locations 为空，5秒后loop");
       return LOCATION_QUERY_LOOP;
     }
-
     locations.forEach(async (loc) => {
       const device = devices.find(d => d.transportId === kindomDeviceTransportIdMap[loc.kindom])
       if (!device) {
