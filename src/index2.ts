@@ -47,6 +47,7 @@ async function main() {
     return LOCATION_QUERY_LOOP
   } catch (error) {
     console.log('main error:', error)
+    return LOCATION_QUERY_LOOP
   }
 }
 
