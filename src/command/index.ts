@@ -164,7 +164,7 @@ export async function run(device: Device, location: Location) {
 
         if (!titlePos) {
             console.log("rok title no found； reloop");
-            clearLocationQuery(location)
+            clearLocationQuery({ ...location, failed: true })
             return LOCATION_QUERY_LOOP;
         }
 
