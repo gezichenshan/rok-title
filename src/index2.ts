@@ -30,20 +30,24 @@ const devices = await adb.map((device) => device);
 // console.log(devices)
 
 async function main() {
-  const locations = await getLocations()
-  if (!locations || locations.length === 0) {
-    console.log("locations 为空，5秒后loop");
-    return LOCATION_QUERY_LOOP;
-  }
-
-  locations.forEach(async (loc) => {
-    const device = devices.find(d => d.transportId === kindomDeviceTransportIdMap[loc.kindom])
-    if (!device) {
-      return
+  try {
+    const locations = await getLocations()
+    if (!locations || locations.length === 0) {
+      console.log("locations 为空，5秒后loop");
+      return LOCATION_QUERY_LOOP;
     }
-    run(device, loc)
-  })
-  return LOCATION_QUERY_LOOP
+
+    locations.forEach(async (loc) => {
+      const device = devices.find(d => d.transportId === kindomDeviceTransportIdMap[loc.kindom])
+      if (!device) {
+        return
+      }
+      run(device, loc)
+    })
+    return LOCATION_QUERY_LOOP
+  } catch (error) {
+    console.log('main error:', error)
+  }
 }
 
 while (true) {
