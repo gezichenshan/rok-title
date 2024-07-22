@@ -22,6 +22,7 @@ import {
     QUICK_TRAVEL_TIMEOUT,
     SLOW_TRAVEL_TIMEOUT,
     LOCATION_QUERY_LOOP,
+    NETWORK_ERR_BTN
 } from "../constant";
 import { Location } from "../model";
 import { updateLocation } from "../services/api";
@@ -52,6 +53,11 @@ function clearLocationQuery(location: Location) {
     updateLocation(location)
 }
 
+async function clearNetworkErr(device: Device) {
+    console.log('clearNetworkErr', NETWORK_ERR_BTN)
+    await device.shell(`input tap ${NETWORK_ERR_BTN}`);
+}
+
 export async function run(device: Device, location: Location) {
     if (isLocationInQueue(location)) {
         console.log('location already in queue')
@@ -60,6 +66,9 @@ export async function run(device: Device, location: Location) {
     locationQueue.push(location)
 
     console.log('start to handle location：', location)
+
+    await clearNetworkErr(device)
+    await wait(750);
 
 
     const isInHomeLnad = async (): Promise<boolean> => {
@@ -95,6 +104,20 @@ export async function run(device: Device, location: Location) {
         return addTitleButtoncoordinates;
     };
 
+    const getCoordinatesInputPosition = async (cityLocationIndex = 0): Promise<string> => {
+        const screenshotBuffer = await device.screenshot();
+        const favIconPosition = await axios
+            .post(`${OPENCY_SERVER_URL}/find_fav_position`, {
+                imgBase64: screenshotBuffer.toString("base64"),
+            })
+            .then((res) => {
+                return res.data;
+            });
+        return `${favIconPosition.x - 20} ${favIconPosition.y + 5}`;
+    };
+
+
+
     try {
         const {
             x: userCorX,
@@ -110,10 +133,17 @@ export async function run(device: Device, location: Location) {
         /**
          * 唤起坐标输入框
          */
-        console.log("is_in_homeland", is_in_homeland);
+        // console.log("is_in_homeland", is_in_homeland);
+        // await device.shell(
+        //     `input tap ${is_in_homeland ? COORDINATES_INPUT : COORDINATES_LOST_INPUT}`
+        // );
+        const cordinatesInputPosition = await getCoordinatesInputPosition()
+        console.log('cordinatesInputPosition', cordinatesInputPosition)
+
         await device.shell(
-            `input tap ${is_in_homeland ? COORDINATES_INPUT : COORDINATES_LOST_INPUT}`
+            `input tap ${cordinatesInputPosition}`
         );
+
         await wait(NEW_CLICK_IDLE_TIMEOUT);
         await device.shell(`input tap ${AREA_CODE_INPUT}`);
 

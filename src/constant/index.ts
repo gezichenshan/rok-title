@@ -31,6 +31,7 @@ export const gonjue = "647 488";
 export const jianzhushi = "931 488";
 export const kexuejia = "1217 488";
 export const role_set_consent_btn = "798 791";
+export const NETWORK_ERR_BTN = "782 576"
 //TIMEOUT
 export const QUICK_TRAVEL_TIMEOUT = 4000;
 export const SLOW_TRAVEL_TIMEOUT = 17000;
