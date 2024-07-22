@@ -227,6 +227,7 @@ export async function run(device: Device, location: Location) {
         clearLocationQuery(location)
     } catch (error) {
         console.log("error occured but cached", error);
+        clearLocationQuery({ ...location, failed: true })
         return LOCATION_QUERY_LOOP;
     }
 }
