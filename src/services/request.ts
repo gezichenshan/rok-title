@@ -1,5 +1,5 @@
 import axios from "axios";
-const baseAPI = "https://rok.3mir.cc/api/";
+const baseAPI = "https://api-rok.3mir.cc/api/";
 
 // const baseAPI = "http://localhost:3019/api/";
 

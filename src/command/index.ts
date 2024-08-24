@@ -117,7 +117,6 @@ export async function run(device: Device, location: Location) {
     };
 
 
-
     try {
         const {
             x: userCorX,
@@ -129,6 +128,8 @@ export async function run(device: Device, location: Location) {
         const areaCode = lost || kindom;
 
         const is_in_homeland = await isInHomeLnad();
+
+        console.log('is_in_homeland', is_in_homeland)
 
         /**
          * 唤起坐标输入框

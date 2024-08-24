@@ -20,14 +20,18 @@ const adb = new AdbClient({
 
 
 const kindomDeviceTransportIdMap = {
-  '544': '2',
+  '544': '1',
   '545': '3'
 }
-
+// 遇到adb devices找不到设备时，先kill掉server再重启
+// /Users/super/yjd/platform-tools/adb kill-server
+// /Users/super/yjd/platform-tools/adb start-server
+// ./src/mumutool port
+// /Users/super/yjd/platform-tools/adb connect 127.0.0.1:21000
 
 const devices = await adb.map((device) => device);
 
-// console.log(devices)
+console.log(devices)
 
 async function main() {
   try {
